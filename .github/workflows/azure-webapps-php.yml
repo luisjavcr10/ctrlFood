@@ -17,10 +17,7 @@ on:
       - "main"  # Use 'main' instead of 'master' for modern conventions
   workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_NAME: your-app-name           # Set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'             # Set this to the path to your web app project, defaults to the repository root
-  PHP_VERSION: '8.x'                         # Set this to the PHP version to use
+# Remove env for versions, setting them directly where required
 
 permissions:
   contents: read                             # Set to read-only for security
@@ -36,7 +33,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2  # Use versioned release instead of commit hash
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: '8.1'  # Set PHP version explicitly to 8.1
+          extensions: mbstring, intl, pdo, curl # Add required PHP extensions
 
       - name: Check if composer.json exists
         id: check_files
@@ -88,6 +86,6 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: your-app-name  # Explicitly set the Azure Web App name here
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          package: '.'  # Explicitly set the package path
