@@ -20,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'  # Actualiza a la versión de PHP requerida por tus paquetes
+          php-version: '8.0'
           extensions: mbstring, intl, pdo, curl
 
       - name: Install Composer
@@ -33,7 +33,7 @@ jobs:
 
       - name: Update Composer Dependencies
         run: |
-          composer update --lock
+          composer update --with-all-dependencies
           composer validate
 
       - name: Install dependencies
