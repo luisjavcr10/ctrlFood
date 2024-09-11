@@ -1,26 +1,13 @@
-# This workflow will build and push a PHP application to an Azure Web App when a commit is pushed to your default branch.
-# This assumes you have already created the target Azure App Service web app.
-# For instructions, see: https://docs.microsoft.com/en-us/azure/app-service/quickstart-php?pivots=platform-linux
-#
-# To configure this workflow:
-# 1. Download the Publish Profile for your Azure Web App from the Overview page of your Web App in the Azure Portal.
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE and paste the publish profile contents as the value.
-# 3. Update the AZURE_WEBAPP_NAME, and optionally adjust AZURE_WEBAPP_PACKAGE_PATH and PHP_VERSION.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-
 name: Build and deploy PHP app to Azure Web App
 
 on:
   push:
     branches: 
-      - "main"  # Use 'main' instead of 'master' for modern conventions
+      - "master"
   workflow_dispatch:
 
-# Remove env for versions, setting them directly where required
-
 permissions:
-  contents: read                             # Set to read-only for security
+  contents: read
 
 jobs:
   build:
@@ -31,35 +18,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2  # Use versioned release instead of commit hash
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'  # Set PHP version explicitly to 8.1
-          extensions: mbstring, intl, pdo, curl # Add required PHP extensions
+          php-version: '7.4'
+          extensions: mbstring, intl, pdo, curl
 
-      - name: Check if composer.json exists
-        id: check_files
-        uses: andstor/file-existence-action@v1.1.0  # Use versioned release
-        with:
-          files: 'composer.json'
-
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        if: steps.check_files.outputs.files_exists == 'true'
+      - name: Install Composer
         run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
 
-      - name: Set up dependency caching for faster installs
-        uses: actions/cache@v3
-        if: steps.check_files.outputs.files_exists == 'true'
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+      - name: Clean Composer Cache
+        run: composer clear-cache
 
-      - name: Install dependencies if composer.json exists
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: composer install --prefer-dist --no-progress
+      - name: Update Composer Dependencies
+        run: |
+          composer update --lock
+          composer validate
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v3
@@ -69,7 +47,7 @@ jobs:
 
   deploy:
     permissions:
-      contents: none  # Ensure least privilege for security
+      contents: none
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -86,6 +64,6 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: your-app-name  # Explicitly set the Azure Web App name here
+          app-name: your-app-name
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: '.'  # Explicitly set the package path
+          package: '.'
