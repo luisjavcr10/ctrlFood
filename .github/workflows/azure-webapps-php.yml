@@ -33,7 +33,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2  # Use versioned release instead of commit hash
         with:
-          php-version: '8.1'  # Set PHP version explicitly to 8.1
+          php-version: '7.4'  # Set PHP version explicitly to 8.1
           extensions: mbstring, intl, pdo, curl # Add required PHP extensions
 
       - name: Check if composer.json exists
