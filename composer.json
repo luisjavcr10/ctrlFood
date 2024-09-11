@@ -23,7 +23,9 @@
         "laravelcollective/html": "^5.8.0",
         "laraveles/spanish": "^1.4",
         "simplesoftwareio/simple-qrcode": "^2.0",
-        "villca/numeros-en-letras": "^1.2"
+        "villca/numeros-en-letras": "^1.2",
+        "php-parallel-lint/php-console-color": "^0.3",
+        "php-parallel-lint/php-console-highlighter": "^0.5"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
