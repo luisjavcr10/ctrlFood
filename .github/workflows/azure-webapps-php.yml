@@ -3,7 +3,7 @@ name: Build and deploy PHP app to Azure Web App
 on:
   push:
     branches: 
-      - "master"
+      - "main"
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.0'  # Actualiza a la versión de PHP requerida por tus paquetes
           extensions: mbstring, intl, pdo, curl
 
       - name: Install Composer
